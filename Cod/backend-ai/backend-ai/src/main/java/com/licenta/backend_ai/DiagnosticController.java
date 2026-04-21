@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class DiagnosticController {
 
-    private final String PYTHON_PATH = "http://127.0.0.1:8050/diagnostic/";
+    private final String PYTHON_PATH = "http://127.0.0.1:8050/diagnostic";
     private final RestClient restClient = RestClient.create();
 
     @PostMapping("/analiza/")
