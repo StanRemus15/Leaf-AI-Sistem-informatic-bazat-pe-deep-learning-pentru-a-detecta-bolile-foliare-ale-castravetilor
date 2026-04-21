@@ -23,15 +23,27 @@ public class DiagnosticController {
     @PostMapping("/analiza/")
     public ResponseEntity<String> PozaLaAi(@RequestParam("file") MultipartFile file) throws IOException {
 
-        ByteArrayResource pozaPy = new ByteArrayResource(file.getBytes())
-        {
-            @Override
-            public String getFilename() {
-                return file.getOriginalFilename() != null ? file.getOriginalFilename() : "poza_test.jpg";
-            }
-        };
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", pozaPy);
-        return null;
+        try {
+            ByteArrayResource pozaPy = new ByteArrayResource(file.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return file.getOriginalFilename() != null ? file.getOriginalFilename() : "poza_test.jpg";
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", pozaPy);
+
+            ResponseEntity<String> response = restClient.post()
+                    .uri(PYTHON_PATH)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(body)
+                    .retrieve()
+                    .toEntity(String.class);
+            return ResponseEntity.ok(response.getBody());
+        }
+        catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
+
 }
