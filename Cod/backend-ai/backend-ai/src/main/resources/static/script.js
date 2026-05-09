@@ -68,38 +68,52 @@ fileInput.addEventListener('change', async function() {
 function populateResults(data) {
     const alertBox = document.getElementById('alertBox');
     const isHealthy = data.boala_detectata.toLowerCase().includes('healthy');
-    const colorVar = isHealthy ? 'var(--primary)' : 'var(--danger)';
+    const isUncertain = data.siguranta < 70;
 
 
-    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    document.getElementById('resultDate').innerText = today;
-
-
-    if(isHealthy) {
-        alertBox.className = "alert-box success";
-        alertBox.innerHTML = `
-            <div style="font-size: 20px;">✅</div>
+    if (isUncertain) {
+        alertBox.className = "alert-box warning";
+        alertBox.innerHTML = `<div style="font-size: 20px;">⚠️</div>
             <div>
-                <div class="fw-bold">No disease detected</div>
-                <div style="font-size: 11px;">Healthy Plant</div>
+                <div class="fw-bold">Diagnostic Incert (${data.siguranta.toFixed(0)}%)</div>
+                <div style="font-size: 11px;">AI-ul are dubii. Verificați calitatea pozei.</div>
             </div>`;
-        document.getElementById('resRecommendation').innerText = "Your plant looks completely healthy. Keep up the good work with watering and nutrients!";
+    } else if (isHealthy) {
+        alertBox.className = "alert-box success";
+        alertBox.innerHTML = `<div style="font-size: 20px;">✅</div>
+            <div><div class="fw-bold">Plantă Sănătoasă</div><div style="font-size: 11px;">Nicio boală detectată</div></div>`;
     } else {
         alertBox.className = "alert-box danger";
-        alertBox.innerHTML = `
-            <div style="font-size: 20px;">❗</div>
-            <div>
-                <div class="fw-bold">${data.boala_detectata} detected</div>
-                <div style="font-size: 11px;">High severity · Plant disease</div>
-            </div>`;
-        document.getElementById('resRecommendation').innerText = "Apply specific fungicide/treatment for this disease. Remove infected leaves immediately to prevent spread.";
+        alertBox.innerHTML = `<div style="font-size: 20px;">❗</div>
+            <div><div class="fw-bold">${data.boala_detectata} detectată</div><div style="font-size: 11px;">Severitate Ridicată</div></div>`;
     }
 
 
     document.getElementById('resDiseaseName').innerText = data.boala_detectata;
     document.getElementById('resConfidence').innerText = data.siguranta.toFixed(0) + '%';
     document.getElementById('resProgressBar').style.width = data.siguranta + '%';
-    document.getElementById('resProgressBar').style.backgroundColor = colorVar;
+    document.getElementById('resProgressBar').style.backgroundColor = isUncertain ? "#EF9F27" : (isHealthy ? "#3B6D11" : "#E24B4A");
+
+
+    let htmlAlternative = `<p class="text-muted mt-3" style="font-size: 11px; text-transform: uppercase;">Alte posibilități</p>`;
+    data.alternative.forEach(alt => {
+        htmlAlternative += `
+            <div class="d-flex justify-content-between small text-muted mb-1">
+                <span>${alt.boala}</span>
+                <span>${alt.siguranta.toFixed(0)}%</span>
+            </div>
+            <div class="progress mb-2" style="height: 3px; opacity: 0.5;">
+                <div class="progress-bar bg-secondary" style="width: ${alt.siguranta}%"></div>
+            </div>`;
+    });
+
+
+    const recBox = document.querySelector('.recommendation-box');
+    recBox.innerHTML = `
+        <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Recomandare</p>
+        <p class="small mb-2">${isUncertain ? "Vă rugăm să repetați poza la lumină naturală pentru un diagnostic mai precis." : "Aplicați tratamentul specific și izolați plantele afectate."}</p>
+        ${htmlAlternative}
+    `;
 }
 
 
