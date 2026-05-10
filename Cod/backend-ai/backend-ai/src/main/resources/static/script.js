@@ -1,19 +1,14 @@
-
 const fileInput = document.getElementById('fileInput');
 const resultImage = document.getElementById('resultImage');
-
-
 const screenUpload = document.getElementById('screen-upload');
 const screenAnalyzing = document.getElementById('screen-analyzing');
 const screenResults = document.getElementById('screen-results');
 const screenHistory = document.getElementById('screen-history');
 
-
 function showScreen(screenElement) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     screenElement.classList.add('active');
 }
-
 
 document.getElementById('navToHistory').addEventListener('click', () => {
     loadHistory();
@@ -26,16 +21,13 @@ document.getElementById('btnSaveHistory').addEventListener('click', () => {
     showScreen(screenHistory);
 });
 
-
 fileInput.addEventListener('change', async function() {
     const file = this.files[0];
     if (!file) return;
 
-
     const reader = new FileReader();
     reader.onload = function(e) { resultImage.src = e.target.result; }
     reader.readAsDataURL(file);
-
 
     showScreen(screenAnalyzing);
 
@@ -53,7 +45,7 @@ fileInput.addEventListener('change', async function() {
             populateResults(data);
             setTimeout(() => showScreen(screenResults), 1500);
         } else {
-            alert("Eroare la procesarea pozei de către server.");
+            alert("Eroare la procesarea pozei de catre server.");
             showScreen(screenUpload);
         }
     } catch (error) {
@@ -64,41 +56,46 @@ fileInput.addEventListener('change', async function() {
     }
 });
 
-
 function populateResults(data) {
     const alertBox = document.getElementById('alertBox');
     const isHealthy = data.boala_detectata.toLowerCase().includes('healthy');
-    const isUncertain = data.siguranta < 70;
+    const isUncertain = data.siguranta < 65;
 
+    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    document.getElementById('resultDate').innerText = today;
 
     if (isUncertain) {
         alertBox.className = "alert-box warning";
-        alertBox.innerHTML = `<div style="font-size: 20px;">⚠️</div>
+        alertBox.innerHTML = `
             <div>
                 <div class="fw-bold">Diagnostic Incert (${data.siguranta.toFixed(0)}%)</div>
-                <div style="font-size: 11px;">AI-ul are dubii. Verificați calitatea pozei.</div>
+                <div style="font-size: 11px;">AI-ul are dubii. Repetati poza la lumina mai buna.</div>
             </div>`;
     } else if (isHealthy) {
         alertBox.className = "alert-box success";
-        alertBox.innerHTML = `<div style="font-size: 20px;">✅</div>
-            <div><div class="fw-bold">Plantă Sănătoasă</div><div style="font-size: 11px;">Nicio boală detectată</div></div>`;
+        alertBox.innerHTML = `
+            <div>
+                <div class="fw-bold">Planta Sanatoasa</div>
+                <div style="font-size: 11px;">Nicio boala detectata.</div>
+            </div>`;
     } else {
         alertBox.className = "alert-box danger";
-        alertBox.innerHTML = `<div style="font-size: 20px;">❗</div>
-            <div><div class="fw-bold">${data.boala_detectata} detectată</div><div style="font-size: 11px;">Severitate Ridicată</div></div>`;
+        alertBox.innerHTML = `
+            <div>
+                <div class="fw-bold">${data.boala_detectata}</div>
+                <div style="font-size: 11px;">Severitate Ridicata. Boala detectata.</div>
+            </div>`;
     }
-
 
     document.getElementById('resDiseaseName').innerText = data.boala_detectata;
     document.getElementById('resConfidence').innerText = data.siguranta.toFixed(0) + '%';
     document.getElementById('resProgressBar').style.width = data.siguranta + '%';
     document.getElementById('resProgressBar').style.backgroundColor = isUncertain ? "#EF9F27" : (isHealthy ? "#3B6D11" : "#E24B4A");
 
-
-    let htmlAlternative = `<p class="text-muted mt-3" style="font-size: 11px; text-transform: uppercase;">Alte posibilități</p>`;
+    let alternativeHTML = `<p class="text-muted mt-3" style="font-size: 10px; text-transform: uppercase;">Alte posibilitati:</p>`;
     data.alternative.forEach(alt => {
-        htmlAlternative += `
-            <div class="d-flex justify-content-between small text-muted mb-1">
+        alternativeHTML += `
+            <div class="d-flex justify-content-between small text-muted">
                 <span>${alt.boala}</span>
                 <span>${alt.siguranta.toFixed(0)}%</span>
             </div>
@@ -107,15 +104,13 @@ function populateResults(data) {
             </div>`;
     });
 
-
     const recBox = document.querySelector('.recommendation-box');
     recBox.innerHTML = `
         <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Recomandare</p>
-        <p class="small mb-2">${isUncertain ? "Vă rugăm să repetați poza la lumină naturală pentru un diagnostic mai precis." : "Aplicați tratamentul specific și izolați plantele afectate."}</p>
-        ${htmlAlternative}
+        <p class="small mb-0">${isUncertain ? "Va recomandam o inspectie vizuala atenta." : "Izolati planta si aplicati tratamentul."}</p>
+        ${alternativeHTML}
     `;
 }
-
 
 async function loadHistory() {
     try {
@@ -124,53 +119,51 @@ async function loadHistory() {
 
         const dateIstoric = await response.json();
 
-
         const totalScans = dateIstoric.length;
-        const totalDiseases = dateIstoric.filter(d => !d.boala.toLowerCase().includes('healthy')).length;
-        const avgConf = totalScans > 0 ? (dateIstoric.reduce((sum, d) => sum + d.siguranta, 0) / totalScans).toFixed(0) : 0;
+        const totalDiseases = dateIstoric.filter(d => d.boala && !d.boala.toLowerCase().includes('healthy')).length;
+        const avgConf = totalScans > 0 ? (dateIstoric.reduce((sum, d) => sum + (d.siguranta || 0), 0) / totalScans).toFixed(0) : 0;
 
         document.getElementById('statTotal').innerText = totalScans;
         document.getElementById('statDiseases').innerText = totalDiseases;
         document.getElementById('statAvg').innerText = avgConf + '%';
 
-
         const listContainer = document.getElementById('historyList');
+        if (!listContainer) return;
+
         listContainer.innerHTML = '';
 
-
         dateIstoric.reverse().forEach(item => {
-            const isHealthy = item.boala.toLowerCase().includes('healthy');
-
+            const boalaNume = item.boala || "Diagnostic Necunoscut";
+            const siguranta = item.siguranta || 0;
+            const isHealthy = boalaNume.toLowerCase().includes('healthy');
 
             let typeClass = 'danger';
             let dotColor = 'var(--danger)';
-            let iconText = '❗';
 
             if (isHealthy) {
                 typeClass = 'success';
                 dotColor = 'var(--primary)';
-                iconText = '✅';
-            } else if (item.siguranta < 85) {
+            } else if (siguranta < 75) {
                 typeClass = 'warning';
                 dotColor = 'var(--warning)';
-                iconText = '⚠️';
             }
 
-
-            const scanDate = new Date(item.dataScanarii).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            let scanDate = "Data necunoscuta";
+            if (item.dataScanarii) {
+                scanDate = new Date(item.dataScanarii).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
 
             const row = `
                 <div class="history-item ${typeClass}">
-                    <div class="history-icon" style="border: 1px solid ${dotColor}; color: ${dotColor};">${iconText}</div>
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background-color: ${dotColor};"></div>
                     <div style="flex-grow: 1;">
-                        <div class="fw-bold" style="font-size: 13px;">${item.boala}</div>
-                        <div class="text-muted" style="font-size: 10px;">${scanDate} · ${item.siguranta.toFixed(0)}% confidence</div>
+                        <div class="fw-bold" style="font-size: 13px;">${boalaNume}</div>
+                        <div class="text-muted" style="font-size: 10px;">${scanDate} · ${siguranta.toFixed(0)}% confidence</div>
                     </div>
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background-color: ${dotColor};"></div>
                 </div>`;
             listContainer.innerHTML += row;
         });
     } catch (error) {
-        console.error("Nu s-a putut încărca istoricul.");
+        console.error("Eroare la desenarea istoricului: ", error);
     }
 }
