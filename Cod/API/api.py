@@ -10,6 +10,17 @@ import os
 os.environ['TF_ENABLE_ONEDNN_OPTS']= '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+def contine_frunza(imagine_pil):
+    img_hsv = imagine_pil.convert('HSV')
+    pix = np.array(img_hsv)
+
+    h = pix[:,:,0]
+    s = pix[:,:,1]
+
+    masca_plante =((h>15) & (h<130) & (s>30))
+    procentaj = np.sum(masca_plante)/(pix.shape[0]*pix.shape[1])
+    return procentaj > 0.03
+
 app = FastAPI()
 @kr.saving.register_keras_serializable()
 def squeeze_excite_block(tensor,ratio=16):
@@ -28,7 +39,11 @@ print("Done")
 @app.post("/diagnostic")
 async def analizare_poza(file: UploadFile = File(...)):
     continut_poza = await file.read()
+
     imagine = Image.open(io.BytesIO(continut_poza)).convert('RGB').resize((256,256))
+
+    if not contine_frunza(imagine):
+        return {"eroare": "Imaginea nu este frunza"}
 
     imagine_array = kr.utils.img_to_array(imagine)
     imagine_array = np.expand_dims(imagine_array,axis=0)
