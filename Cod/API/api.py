@@ -5,23 +5,47 @@ import io
 import uvicorn
 from PIL import Image
 import tensorflow as tf
+import cv2
 
 import os
+
+from tensorflow.python.ops.gen_array_ops import lower_bound
+
 os.environ['TF_ENABLE_ONEDNN_OPTS']= '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-def contine_frunza(imagine_pil):
-    img_hsv = imagine_pil.convert('HSV')
-    pix = np.array(img_hsv)
-
-    h = pix[:,:,0]
-    s = pix[:,:,1]
-
-    masca_plante =((h>15) & (h<130) & (s>30))
-    procentaj = np.sum(masca_plante)/(pix.shape[0]*pix.shape[1])
-    return procentaj > 0.03
-
 app = FastAPI()
+
+def contine_frunza(imagine_pil):
+    img_array = np.array(imagine_pil)
+
+    if len(img_array.shape) !=3 or img_array.shape[2] != 3:
+        return False
+
+    img_bgr =cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    img_hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
+
+
+    lower_bnd = np.array([25,40,40])
+    upper_bnd = np.array([95,255,255])
+
+    mask = cv2.inRange(img_hsv, lower_bnd, upper_bnd)
+
+    countur,_ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+    if not countur:
+        return False
+
+    max_contur = max(countur, key=cv2.contourArea)
+    arie = cv2.contourArea(max_contur)
+
+    arie_total = img_bgr.shape[0] * img_bgr.shape[1]
+    procent = arie/arie_total
+
+    print(f"---> Cel mai mare obiect verde conectat ocupa: {procent * 100:.2f}% din poza")
+    return procent > 0.20
+
+
 @kr.saving.register_keras_serializable()
 def squeeze_excite_block(tensor,ratio=16):
     filters = tensor.shape[-1]
