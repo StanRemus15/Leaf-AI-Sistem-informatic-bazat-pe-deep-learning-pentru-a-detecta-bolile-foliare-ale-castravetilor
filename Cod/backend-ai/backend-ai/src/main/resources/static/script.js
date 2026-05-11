@@ -58,8 +58,8 @@ fileInput.addEventListener('change', async function() {
 
 function populateResults(data) {
     const alertBox = document.getElementById('alertBox');
-    const isHealthy = data.boala_detectata.toLowerCase().includes('healthy');
-    const isUncertain = data.siguranta < 65;
+    const recBox = document.querySelector('.recommendation-box');
+    const btnSave = document.getElementById('btnSaveHistory');
 
     if (data.eroare) {
         alertBox.className = "alert-box danger";
@@ -68,7 +68,6 @@ function populateResults(data) {
                 <div class="fw-bold">Scanare Invalida</div>
                 <div style="font-size: 11px;">${data.eroare}</div>
             </div>`;
-
 
         document.getElementById('resDiseaseName').innerText = "Nedetectat";
         document.getElementById('resConfidence').innerText = "0%";
@@ -83,6 +82,11 @@ function populateResults(data) {
         if (btnSave) btnSave.style.display = 'none';
         return;
     }
+
+    if (btnSave) btnSave.style.display = 'block';
+
+    const isHealthy = data.boala_detectata.toLowerCase().includes('healthy');
+    const isUncertain = data.siguranta < 65;
 
     const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     document.getElementById('resultDate').innerText = today;
@@ -127,7 +131,6 @@ function populateResults(data) {
             </div>`;
     });
 
-    const recBox = document.querySelector('.recommendation-box');
     recBox.innerHTML = `
         <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Recomandare</p>
         <p class="small mb-0">${isUncertain ? "Va recomandam o inspectie vizuala atenta." : "Izolati planta si aplicati tratamentul."}</p>
@@ -186,7 +189,5 @@ async function loadHistory() {
                 </div>`;
             listContainer.innerHTML += row;
         });
-    } catch (error) {
-        console.error("Eroare la desenarea istoricului: ", error);
-    }
+    } catch (error) {}
 }
