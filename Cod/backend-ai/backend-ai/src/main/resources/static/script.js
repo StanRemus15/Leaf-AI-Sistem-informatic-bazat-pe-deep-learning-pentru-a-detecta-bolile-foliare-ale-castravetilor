@@ -25,6 +25,12 @@ fileInput.addEventListener('change', async function() {
     const file = this.files[0];
     if (!file) return;
 
+    if (file.size > 10 * 1024 * 1024) {
+        alert("Imaginea este prea mare! Incarcati o poza de maxim 10MB.");
+        fileInput.value = '';
+        return;
+    }
+
     const reader = new FileReader();
     reader.onload = function(e) { resultImage.src = e.target.result; }
     reader.readAsDataURL(file);
