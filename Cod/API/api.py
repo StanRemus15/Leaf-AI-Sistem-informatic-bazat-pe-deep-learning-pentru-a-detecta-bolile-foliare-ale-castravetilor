@@ -16,35 +16,40 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 app = FastAPI()
 
+
 def contine_frunza(imagine_pil):
     img_array = np.array(imagine_pil)
 
-    if len(img_array.shape) !=3 or img_array.shape[2] != 3:
+    if len(img_array.shape) != 3 or img_array.shape[2] != 3:
         return False
 
-    img_bgr =cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    img_bgr = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
     img_hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
 
 
-    lower_bnd = np.array([25,40,40])
-    upper_bnd = np.array([95,255,255])
+    lower_bound = np.array([25, 40, 40])
+    upper_bound = np.array([95, 255, 255])
 
-    mask = cv2.inRange(img_hsv, lower_bnd, upper_bnd)
+    mask = cv2.inRange(img_hsv, lower_bound, upper_bound)
+    contururi, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    countur,_ = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-
-    if not countur:
+    if not contururi:
         return False
 
-    max_contur = max(countur, key=cv2.contourArea)
-    arie = cv2.contourArea(max_contur)
+    aria_totala_poza = img_bgr.shape[0] * img_bgr.shape[1]
+    aria_totala_verde = 0
 
-    arie_total = img_bgr.shape[0] * img_bgr.shape[1]
-    procent = arie/arie_total
 
-    print(f"---> Cel mai mare obiect verde conectat ocupa: {procent * 100:.2f}% din poza")
-    return procent > 0.20
+    for contur in contururi:
+        aria = cv2.contourArea(contur)
+        if aria / aria_totala_poza > 0.005:
+            aria_totala_verde += aria
 
+    procentaj_final = aria_totala_verde / aria_totala_poza
+
+    print(f"---> Procentaj total de verde valid adunat: {procentaj_final * 100:.2f}%")
+
+    return procentaj_final > 0.15
 
 @kr.saving.register_keras_serializable()
 def squeeze_excite_block(tensor,ratio=16):
