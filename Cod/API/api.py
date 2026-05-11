@@ -49,7 +49,7 @@ def contine_frunza(imagine_pil):
 
     print(f"---> Procentaj total de verde valid adunat: {procentaj_final * 100:.2f}%")
 
-    return procentaj_final > 0.15
+    return procentaj_final > 0.20
 
 @kr.saving.register_keras_serializable()
 def squeeze_excite_block(tensor,ratio=16):
