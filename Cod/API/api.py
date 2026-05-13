@@ -61,7 +61,7 @@ def squeeze_excite_block(tensor,ratio=16):
     return kr.layers.Multiply()([tensor,s_e_b])
 
 print("Model loading...")
-model = kr.models.load_model('model_antrenare_licenta.keras',custom_objects={'squeeze_excite_block':squeeze_excite_block})
+model = kr.models.load_model('model_antrenare_licenta_v2.keras',custom_objects={'squeeze_excite_block':squeeze_excite_block})
 clase_boli = ['Anthracnose', 'Bacterial Wilt', 'Downy Mildew', 'Gummy Stem Blight', 'Healthy']
 print("Done")
 
