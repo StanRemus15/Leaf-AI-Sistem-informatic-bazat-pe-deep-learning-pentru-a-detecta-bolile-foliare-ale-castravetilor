@@ -47,8 +47,6 @@ def contine_frunza(imagine_pil):
 
     procentaj_final = aria_totala_verde / aria_totala_poza
 
-    print(f"---> Procentaj total de verde valid adunat: {procentaj_final * 100:.2f}%")
-
     return procentaj_final > 0.20
 
 @kr.saving.register_keras_serializable()
