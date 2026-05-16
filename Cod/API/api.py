@@ -27,10 +27,15 @@ def contine_frunza(imagine_pil):
     img_hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
 
 
-    lower_bound = np.array([25, 40, 40])
-    upper_bound = np.array([95, 255, 255])
+    lower_bound = np.array([30, 40, 30])
+    upper_bound = np.array([85, 255, 200])
 
     mask = cv2.inRange(img_hsv, lower_bound, upper_bound)
+
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 50, 150)
+    edges_density = np.sum(edges>0)/(img_bgr.shape[0]*img_bgr.shape[1])
+
     contururi, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     if not contururi:
@@ -47,7 +52,7 @@ def contine_frunza(imagine_pil):
 
     procentaj_final = aria_totala_verde / aria_totala_poza
 
-    return procentaj_final > 0.20
+    return procentaj_final > 0.20 and edges_density > 0.05
 
 @kr.saving.register_keras_serializable()
 def squeeze_excite_block(tensor,ratio=16):
