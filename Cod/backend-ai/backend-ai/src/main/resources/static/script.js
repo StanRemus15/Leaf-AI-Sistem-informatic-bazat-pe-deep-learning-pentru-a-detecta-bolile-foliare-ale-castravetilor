@@ -115,7 +115,17 @@ function populateResults(data) {
     document.getElementById('resDiseaseName').innerText = data.boala_detectata;
     document.getElementById('resConfidence').innerText = data.siguranta.toFixed(0) + '%';
     document.getElementById('resProgressBar').style.width = data.siguranta + '%';
-    document.getElementById('resProgressBar').style.backgroundColor = isUncertain ? "#EF9F27" : (isHealthy ? "#3B6D11" : "#E24B4A");
+
+    // Logica nouă pentru culoarea barei de acuratețe
+    let barColor = "";
+    if (data.siguranta >= 80) {
+        barColor = "#3B6D11"; // Verde
+    } else if (data.siguranta >= 55) {
+        barColor = "#EF9F27"; // Galben
+    } else {
+        barColor = "#E24B4A"; // Roșu
+    }
+    document.getElementById('resProgressBar').style.backgroundColor = barColor;
 
     let alternativeHTML = `<p class="text-muted mt-3" style="font-size: 10px; text-transform: uppercase;">Other possibilities:</p>`;
     data.alternative.forEach(alt => {
