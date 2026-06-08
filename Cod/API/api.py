@@ -16,7 +16,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 app = FastAPI()
 
-
+# Functia contine_frunza() este definita la sectiunea 6.2.1
 def contine_frunza(imagine_pil):
     img_array = np.array(imagine_pil)
 
@@ -54,6 +54,7 @@ def contine_frunza(imagine_pil):
 
     return procentaj_final > 0.20 and edges_density > 0.05
 
+# Functia squeeze_excite_block() este definita la secțiunea 6.1
 @kr.saving.register_keras_serializable()
 def squeeze_excite_block(tensor,ratio=16):
     filters = tensor.shape[-1]
