@@ -17,15 +17,12 @@
                     <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
                     <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
                 </div>
-
                 <div class="nav-link" id="navToHistory">
                     <small class="text-muted d-block" style="font-size: 10px;">History &rarr;</small>
                     <span style ="font-size: 11px;">view past scans</span>
                 </div>
             </div>
-
             <h3 class="mt-4 fw-bold text-center">Detect cucumber diseases</h3>
-
             <div class="upload-zone mt-4" id="uploadZone">
                 <div class="upload-icon mb-2">&uarr;</div>
                 <p class="mb-1 fw-bold">Upload a clear photo of your cucumber leaf</p>
@@ -33,7 +30,6 @@
                 <button class="btn btn-primary-custom mt-2" onclick="document.getElementById('fileInput').click()">Choose photo</button>
                 <input type="file" id="fileInput" accept="image/*" style="display: none;">
             </div>
-
             <div class="mt-4">
                 <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Detects</p>
                 <div class="disease-badges">
@@ -44,7 +40,6 @@
                 </div>
             </div>
         </div>
-
         <div id="screen-analyzing" class="screen text-center">
             <div class="header-nav">
                 <div class="logo-container d-flex align-items-center">
@@ -52,18 +47,13 @@
                     <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
                 </div>
             </div>
-
             <h4 class="mt-5 pt-4">Analyzing your image...</h4>
             <p class="text-muted small">This usually takes a few seconds</p>
-
-
             <div class="spinner-area my-5">
                 <div class="spinner-border text-success" style="width: 4rem; height: 4rem;" role="status"></div>
                 <div class="mt-3 text-muted small">Processing...</div>
             </div>
-
         </div>
-
         <div id="screen-results" class="screen">
             <div class="header-nav">
                 <div class="logo-container d-flex align-items-center">
@@ -72,14 +62,11 @@
                 </div>
                 <div class="text-muted small" id="resultDate">Today</div>
             </div>
-
             <div class="image-preview-container mt-3">
                 <img id="resultImage" src="" alt="Uploaded Plant">
             </div>
-
             <div id="alertBox" class="alert-box mt-3">
             </div>
-
             <div class="mt-4">
                 <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Confidence Scores</p>
                 <div class="d-flex justify-content-between small fw-bold mb-1">
@@ -90,12 +77,10 @@
                     <div id="resProgressBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
                 </div>
             </div>
-
             <div class="recommendation-box mt-4">
                 <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Recommendation</p>
                 <p class="small mb-0" id="resRecommendation">Consult a specialist for proper treatment and isolate the plant to prevent spread.</p>
             </div>
-
             <div class="mt-4">
                 <button class="btn btn-primary-custom w-100" id="btnScanAgain">Scan again</button>
             </div>
@@ -109,7 +94,6 @@
                 </div>
                 <button class="btn btn-primary-custom btn-sm py-1 px-3" id="btnNewScan">+ New</button>
             </div>
-
             <div class="stats-box mt-3 d-flex justify-content-between text-center">
                 <div>
                     <h3 class="fw-bold mb-0" id="statTotal">0</h3>
@@ -124,9 +108,7 @@
                     <small class="text-muted" style="font-size: 10px;">Avg. confidence</small>
                 </div>
             </div>
-
             <p class="text-muted mt-4 mb-2" style="font-size: 11px; text-transform: uppercase;">Recent Scans</p>
-
             <div id="historyList" class="history-list">
             </div>
         </div>
