@@ -11,6 +11,34 @@
 <body>
 
     <div class="app-wrapper">
+        <div id="screen-login" class="screen active">
+            <div class="header-nav justify-content-center">
+                <div class ="logo-container d-flex align-items-center">
+                    <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px;width: auto;margin-right: 10px">
+                    <span class="text-muted" style="font-size: 0.9rem;border-left: 1px solid #ccc;padding-left: 10px">Leaf-AI</span>
+                </div>
+            </div>
+
+            <h3 class="mt-5 fw-bold text-center" id="authTitle">Welcome back</h3>
+            <p class ="text-muted text-center small" id="authSubtitle">Sign in to access your scan history</p>
+
+            <div class="login-box mt-4">
+                <label class="form-label small fw-bold">Username</label>
+                <input type="text" id="authUsername" class="form-control mb-3" placeholder="Enter your username" autocomplete="username">
+
+                <label class="form-label small fw-bold">Password</label>
+                <input type="password" id="authParola" class="form-control mb-3" placeholder="Enter your password" autocomplete="current-password">
+
+                <div id="authError" class="text-danger small mb-2" style="display: none;"></div>
+                <button class="btn btn-primary-custom w-100" id="btnAuthSubmit">Sign in</button>
+                <p class="text-center text-muted small mt-3 mb-0">
+                <span id="authSwitchText">Don't have an account?</span>
+                <a href="#" id="authSwitchLink" class="fw-bold" style="color: var(--primary);">Create one</a>
+                </p>
+            </div>
+        </div>
+            </div>
+        </div>
         <div id="screen-upload" class="screen active">
             <div class="header-nav">
                 <div class="logo-container d-flex align-items-center">
@@ -85,7 +113,6 @@
                 <button class="btn btn-primary-custom w-100" id="btnScanAgain">Scan again</button>
             </div>
         </div>
-
         <div id="screen-history" class="screen">
             <div class="header-nav">
                 <div class="logo-container d-flex align-items-center">

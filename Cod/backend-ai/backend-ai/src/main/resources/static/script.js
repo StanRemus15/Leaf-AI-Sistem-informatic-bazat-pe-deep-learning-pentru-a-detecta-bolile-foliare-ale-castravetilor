@@ -1,9 +1,109 @@
 const fileInput = document.getElementById('fileInput');
 const resultImage = document.getElementById('resultImage');
+const screenLogin = document.getElementById('screen-login')
 const screenUpload = document.getElementById('screen-upload');
 const screenAnalyzing = document.getElementById('screen-analyzing');
 const screenResults = document.getElementById('screen-results');
 const screenHistory = document.getElementById('screen-history');
+
+let currentUser = null;
+
+function saveUser(user)
+{
+    currentUser=user;
+    localStorage.setItem('leafai_user',JSON.stringify(user));
+}
+
+function loadSavedUser()
+{
+    const saved = localStorage.getItem('leafai_user');
+    if(saved)
+    {
+        try
+        {
+            currentUser=JSON.parse(saved);
+        }
+        catch (e)
+        {
+            currentUser = null;
+        }
+    }
+}
+function logout()
+{
+    currentUser=null;
+    localStorage.removeItem('leafai_user');
+    showScreen(screenLogin);
+}
+
+let isRegisterMode = false;
+
+function updateAuthScreen() {
+    document.getElementById('authTitle').innerText=isRegisterMode?"Create account":"Welcome back";
+    document.getElementById('authSubtitle').innerText=isRegisterMode?"Register to start scanning your plants"
+        : "Sign in to access your scan history";
+    document.getElementById('btnAuthSubmit').innerText = isRegisterMode ? "Create account" : "Sign in";
+    document.getElementById('authSwitchText').innerText = isRegisterMode ? "Already have an account?" : "Don't have an account?";
+    document.getElementById('authSwitchLink').innerText = isRegisterMode ? "Sign in" : "Create one";
+    hideAuthError();
+}
+function hideAuthError() {
+    document.getElementById('authError').style.display = 'none';
+}
+
+document.getElementById('authSwitchLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    isRegisterMode = !isRegisterMode;
+    updateAuthScreen();
+});
+
+document.getElementById('btnAuthSubmit').addEventListener('click', async () => {
+    const username = document.getElementById('authUsername').value.trim();
+    const parola = document.getElementById('authParola').value;
+
+    if (!username || !parola) {
+        showAuthError("Please fill in both fields.");
+        return;
+    }
+
+    const endpoint = isRegisterMode ? '/api/auth/register' : '/api/auth/login';
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username, parola: parola })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.eroare) {
+            showAuthError(data.eroare || "Something went wrong. Please try again.");
+            return;
+        }
+
+        saveUser(data);
+        enterApp();
+    } catch (error) {
+        showAuthError("Server connection error.");
+    }
+});
+
+function enterApp() {
+    document.getElementById('loggedUser').innerText = currentUser.username;
+    document.getElementById('authParola').value = '';
+    hideAuthError();
+    showScreen(screenUpload);
+}
+
+document.getElementById('btnLogout').addEventListener('click', logout);
+
+function showAuthError(msg) {
+    const box = document.getElementById('authError');
+    box.innerText = msg;
+    box.style.display = 'block';
+}
+
 
 function showScreen(screenElement) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -36,7 +136,7 @@ fileInput.addEventListener('change', async function() {
 
     const formData = new FormData();
     formData.append("file", file);
-
+    formData.append("userId", currentUser.id);
     try {
         const response = await fetch('/api/ai-detection/analiza/', {
             method: 'POST',
@@ -63,8 +163,6 @@ function populateResults(data) {
     const alertBox = document.getElementById('alertBox');
     const recBox = document.querySelector('.recommendation-box');
 
-    // Cazul de eroare: daca backend-ul a returnat un mesaj de eroare,
-    // afisez alertBox in rosu si resetez campurile de pe ecran
     if (data.eroare) {
         alertBox.className = "alert-box danger";
         alertBox.innerHTML = `
@@ -85,15 +183,12 @@ function populateResults(data) {
         return;
     }
 
-    // Determin tipul rezultatului: sanatos sau diagnostic incert (sub 65% siguranta)
     const isHealthy = data.boala_detectata.toLowerCase().includes('healthy');
     const isUncertain = data.siguranta < 65;
 
-    // Setez data scanarii pentru afisare
     const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     document.getElementById('resultDate').innerText = today;
 
-    // Configurez alertBox-ul in functie de tipul rezultatului
     if (isUncertain) {
         alertBox.className = "alert-box warning";
         alertBox.innerHTML = `
@@ -117,23 +212,11 @@ function populateResults(data) {
             </div>`;
     }
 
-    // Actualizez denumirea bolii, scorul de siguranta si progress bar-ul
     document.getElementById('resDiseaseName').innerText = data.boala_detectata;
     document.getElementById('resConfidence').innerText = data.siguranta.toFixed(0) + '%';
     document.getElementById('resProgressBar').style.width = data.siguranta + '%';
+    document.getElementById('resProgressBar').style.backgroundColor = isUncertain ? "#EF9F27" : (isHealthy ? "#3B6D11" : "#E24B4A");
 
-    // Schimb culoarea progress bar-ului in functie de nivelul de siguranta
-    let barColor = "";
-    if (data.siguranta >= 80) {
-        barColor = "#3B6D11";
-    } else if (data.siguranta >= 49) {
-        barColor = "#EF9F27";
-    } else {
-        barColor = "#E24B4A";
-    }
-    document.getElementById('resProgressBar').style.backgroundColor = barColor;
-
-    // Construiesc lista cu primele doua alternative posibile (Other possibilities)
     let alternativeHTML = `<p class="text-muted mt-3" style="font-size: 10px; text-transform: uppercase;">Other possibilities:</p>`;
     data.alternative.forEach(alt => {
         alternativeHTML += `
@@ -146,7 +229,6 @@ function populateResults(data) {
             </div>`;
     });
 
-    // Dictionarul cu recomandari concrete pentru fiecare boala
     const recomandari = {
         'Anthracnose': "Remove infected leaves, apply a copper-based fungicide, and avoid overhead watering.",
         'Bacterial Wilt': "Remove and destroy the plant immediately. Control cucumber beetles, as they spread the bacteria.",
@@ -155,15 +237,12 @@ function populateResults(data) {
         'Healthy': "The plant is healthy! Continue normal care and monitor it periodically."
     };
 
-    // Selectez recomandarea in functie de boala detectata
     let textRecomandare = recomandari[data.boala_detectata] || "Isolate the plant and consult a specialist for treatment.";
 
-    // Daca diagnosticul este incert, suprascriu recomandarea cu un mesaj specific
     if (isUncertain) {
         textRecomandare = "The diagnosis is uncertain. Please retake the photo, preferably in natural light, focusing clearly on the affected leaf.";
     }
 
-    // Construiesc HTML-ul final cu recomandarea + alternative
     recBox.innerHTML = `
         <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Treatment Recommendation</p>
         <p class="small mb-0 fw-bold" style="color: #333;">${textRecomandare}</p>
@@ -173,28 +252,24 @@ function populateResults(data) {
 
 async function loadHistory() {
     try {
-        // Cerere GET catre backend pentru a obtine toate diagnosticele salvate
-        const response = await fetch('/api/ai-detection/istoric');
+        const response = await fetch('/api/ai-detection/istoric?userId=' + currentUser.id);
         if (!response.ok) return;
 
         const dateIstoric = await response.json();
-        // Calculez cele trei statistici afisate in header-ul ecranului
 
         const totalScans = dateIstoric.length;
         const totalDiseases = dateIstoric.filter(d => d.boala && !d.boala.toLowerCase().includes('healthy')).length;
         const avgConf = totalScans > 0 ? (dateIstoric.reduce((sum, d) => sum + (d.siguranta || 0), 0) / totalScans).toFixed(0) : 0;
-        // Actualizez contoarele afisate in interfata
 
         document.getElementById('statTotal').innerText = totalScans;
         document.getElementById('statDiseases').innerText = totalDiseases;
         document.getElementById('statAvg').innerText = avgConf + '%';
-        // Resetez continutul listei inainte de a o repopula
 
         const listContainer = document.getElementById('historyList');
         if (!listContainer) return;
 
         listContainer.innerHTML = '';
-        // Daca nu exista scanari, afisez un mesaj informativ in locul listei
+
         if (dateIstoric.length === 0) {
             listContainer.innerHTML = `
                 <div class="text-center p-4 text-muted border rounded mt-3" style="background-color: #fafafa;">
@@ -203,23 +278,21 @@ async function loadHistory() {
                 </div>`;
             return;
         }
-        // Inversez ordinea pentru a afisa cele mai recente scanari primele
+
         dateIstoric.reverse().forEach(item => {
             const boalaNume = item.boala || "Unknown Diagnosis";
             const siguranta = item.siguranta || 0;
+            const isHealthy = boalaNume.toLowerCase().includes('healthy');
 
-            let typeClass = '';
-            let dotColor = '';
+            let typeClass = 'danger';
+            let dotColor = 'var(--danger)';
 
-            if (siguranta >= 80) {
+            if (isHealthy) {
                 typeClass = 'success';
-                dotColor = '#3B6D11';
-            } else if (siguranta >= 49) {
+                dotColor = 'var(--primary)';
+            } else if (siguranta < 75) {
                 typeClass = 'warning';
-                dotColor = '#EF9F27';
-            } else {
-                typeClass = 'danger';
-                dotColor = '#E24B4A';
+                dotColor = 'var(--warning)';
             }
 
             let scanDate = "Unknown date";
@@ -238,4 +311,12 @@ async function loadHistory() {
             listContainer.innerHTML += row;
         });
     } catch (error) {}
+}
+
+
+loadSavedUser();
+if (currentUser) {
+    enterApp();
+} else {
+    showScreen(screenLogin);
 }
