@@ -1,6 +1,6 @@
 const fileInput = document.getElementById('fileInput');
 const resultImage = document.getElementById('resultImage');
-const screenLogin = document.getElementById('screen-login')
+const screenLogin = document.getElementById('screen-login');
 const screenUpload = document.getElementById('screen-upload');
 const screenAnalyzing = document.getElementById('screen-analyzing');
 const screenResults = document.getElementById('screen-results');
@@ -8,30 +8,20 @@ const screenHistory = document.getElementById('screen-history');
 
 let currentUser = null;
 
-function saveUser(user)
-{
-    currentUser=user;
-    localStorage.setItem('leafai_user',JSON.stringify(user));
+function saveUser(user) {
+    currentUser = user;
+    localStorage.setItem('leafai_user', JSON.stringify(user));
 }
 
-function loadSavedUser()
-{
+function loadSavedUser() {
     const saved = localStorage.getItem('leafai_user');
-    if(saved)
-    {
-        try
-        {
-            currentUser=JSON.parse(saved);
-        }
-        catch (e)
-        {
-            currentUser = null;
-        }
+    if (saved) {
+        try { currentUser = JSON.parse(saved); } catch (e) { currentUser = null; }
     }
 }
-function logout()
-{
-    currentUser=null;
+
+function logout() {
+    currentUser = null;
     localStorage.removeItem('leafai_user');
     showScreen(screenLogin);
 }
@@ -39,14 +29,22 @@ function logout()
 let isRegisterMode = false;
 
 function updateAuthScreen() {
-    document.getElementById('authTitle').innerText=isRegisterMode?"Create account":"Welcome back";
-    document.getElementById('authSubtitle').innerText=isRegisterMode?"Register to start scanning your plants"
+    document.getElementById('authTitle').innerText = isRegisterMode ? "Create account" : "Welcome back";
+    document.getElementById('authSubtitle').innerText = isRegisterMode
+        ? "Register to start scanning your plants"
         : "Sign in to access your scan history";
     document.getElementById('btnAuthSubmit').innerText = isRegisterMode ? "Create account" : "Sign in";
     document.getElementById('authSwitchText').innerText = isRegisterMode ? "Already have an account?" : "Don't have an account?";
     document.getElementById('authSwitchLink').innerText = isRegisterMode ? "Sign in" : "Create one";
     hideAuthError();
 }
+
+function showAuthError(msg) {
+    const box = document.getElementById('authError');
+    box.innerText = msg;
+    box.style.display = 'block';
+}
+
 function hideAuthError() {
     document.getElementById('authError').style.display = 'none';
 }
@@ -59,9 +57,9 @@ document.getElementById('authSwitchLink').addEventListener('click', (e) => {
 
 document.getElementById('btnAuthSubmit').addEventListener('click', async () => {
     const username = document.getElementById('authUsername').value.trim();
-    const parola = document.getElementById('authParola').value;
+    const password = document.getElementById('authPassword').value;
 
-    if (!username || !parola) {
+    if (!username || !password) {
         showAuthError("Please fill in both fields.");
         return;
     }
@@ -72,7 +70,7 @@ document.getElementById('btnAuthSubmit').addEventListener('click', async () => {
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: username, parola: parola })
+            body: JSON.stringify({ username: username, password: password })
         });
 
         const data = await response.json();
@@ -91,18 +89,12 @@ document.getElementById('btnAuthSubmit').addEventListener('click', async () => {
 
 function enterApp() {
     document.getElementById('loggedUser').innerText = currentUser.username;
-    document.getElementById('authParola').value = '';
+    document.getElementById('authPassword').value = '';
     hideAuthError();
     showScreen(screenUpload);
 }
 
 document.getElementById('btnLogout').addEventListener('click', logout);
-
-function showAuthError(msg) {
-    const box = document.getElementById('authError');
-    box.innerText = msg;
-    box.style.display = 'block';
-}
 
 
 function showScreen(screenElement) {
@@ -117,6 +109,7 @@ document.getElementById('navToHistory').addEventListener('click', () => {
 
 document.getElementById('btnNewScan').addEventListener('click', () => showScreen(screenUpload));
 document.getElementById('btnScanAgain').addEventListener('click', () => showScreen(screenUpload));
+
 
 fileInput.addEventListener('change', async function() {
     const file = this.files[0];
@@ -137,6 +130,7 @@ fileInput.addEventListener('change', async function() {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("userId", currentUser.id);
+
     try {
         const response = await fetch('/api/ai-detection/analiza/', {
             method: 'POST',
@@ -249,6 +243,7 @@ function populateResults(data) {
         ${alternativeHTML}
     `;
 }
+
 
 async function loadHistory() {
     try {

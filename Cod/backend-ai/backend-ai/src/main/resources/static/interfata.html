@@ -10,139 +10,166 @@
 </head>
 <body>
 
-    <div class="app-wrapper">
-        <div id="screen-login" class="screen active">
-            <div class="header-nav justify-content-center">
-                <div class ="logo-container d-flex align-items-center">
-                    <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px;width: auto;margin-right: 10px">
-                    <span class="text-muted" style="font-size: 0.9rem;border-left: 1px solid #ccc;padding-left: 10px">Leaf-AI</span>
-                </div>
+<div class="app-wrapper">
+
+    <div id="screen-login" class="screen active">
+        <div class="header-nav justify-content-center">
+            <div class="logo-container d-flex align-items-center">
+                <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
+                <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
             </div>
+        </div>
 
-            <h3 class="mt-5 fw-bold text-center" id="authTitle">Welcome back</h3>
-            <p class ="text-muted text-center small" id="authSubtitle">Sign in to access your scan history</p>
+        <h3 class="mt-5 fw-bold text-center" id="authTitle">Welcome back</h3>
+        <p class="text-muted text-center small" id="authSubtitle">Sign in to access your scan history</p>
 
-            <div class="login-box mt-4">
-                <label class="form-label small fw-bold">Username</label>
-                <input type="text" id="authUsername" class="form-control mb-3" placeholder="Enter your username" autocomplete="username">
+        <div class="login-box mt-4">
+            <label class="form-label small fw-bold">Username</label>
+            <input type="text" id="authUsername" class="form-control mb-3" placeholder="Enter your username" autocomplete="username">
 
-                <label class="form-label small fw-bold">Password</label>
-                <input type="password" id="authParola" class="form-control mb-3" placeholder="Enter your password" autocomplete="current-password">
+            <label class="form-label small fw-bold">Password</label>
+            <input type="password" id="authPassword" class="form-control mb-3" placeholder="Enter your password" autocomplete="current-password">
 
-                <div id="authError" class="text-danger small mb-2" style="display: none;"></div>
-                <button class="btn btn-primary-custom w-100" id="btnAuthSubmit">Sign in</button>
-                <p class="text-center text-muted small mt-3 mb-0">
+            <div id="authError" class="text-danger small mb-2" style="display: none;"></div>
+
+            <button class="btn btn-primary-custom w-100" id="btnAuthSubmit">Sign in</button>
+
+            <p class="text-center text-muted small mt-3 mb-0">
                 <span id="authSwitchText">Don't have an account?</span>
                 <a href="#" id="authSwitchLink" class="fw-bold" style="color: var(--primary);">Create one</a>
-                </p>
-            </div>
+            </p>
         </div>
+    </div>
+
+    <div id="screen-upload" class="screen">
+        <div class="header-nav">
+            <div class="logo-container d-flex align-items-center">
+                <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
+                <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
             </div>
-        </div>
-        <div id="screen-upload" class="screen active">
-            <div class="header-nav">
-                <div class="logo-container d-flex align-items-center">
-                    <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
-                    <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
-                </div>
+
+            <div class="d-flex align-items-center gap-3">
                 <div class="nav-link" id="navToHistory">
                     <small class="text-muted d-block" style="font-size: 10px;">History &rarr;</small>
-                    <span style ="font-size: 11px;">view past scans</span>
+                    <span style="font-size: 11px;">view past scans</span>
                 </div>
-            </div>
-            <h3 class="mt-4 fw-bold text-center">Detect cucumber diseases</h3>
-            <div class="upload-zone mt-4" id="uploadZone">
-                <div class="upload-icon mb-2">&uarr;</div>
-                <p class="mb-1 fw-bold">Upload a clear photo of your cucumber leaf</p>
-                <p class="text-muted" style="font-size: 11px;">JPG</p>
-                <button class="btn btn-primary-custom mt-2" onclick="document.getElementById('fileInput').click()">Choose photo</button>
-                <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            </div>
-            <div class="mt-4">
-                <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Detects</p>
-                <div class="disease-badges">
-                    <span class="badge-custom">Anthracnose</span>
-                    <span class="badge-custom">Bacterial Wilt</span>
-                    <span class="badge-custom">Downy Mildew</span>
-                    <span class="badge-custom">Gummy Stem Blight</span>
+                <div class="nav-link text-end" id="btnLogout">
+                    <small class="text-muted d-block" style="font-size: 10px;" id="loggedUser">user</small>
+                    <span style="font-size: 11px; color: var(--danger);">Log out</span>
                 </div>
             </div>
         </div>
-        <div id="screen-analyzing" class="screen text-center">
-            <div class="header-nav">
-                <div class="logo-container d-flex align-items-center">
-                    <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
-                    <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
-                </div>
-            </div>
-            <h4 class="mt-5 pt-4">Analyzing your image...</h4>
-            <p class="text-muted small">This usually takes a few seconds</p>
-            <div class="spinner-area my-5">
-                <div class="spinner-border text-success" style="width: 4rem; height: 4rem;" role="status"></div>
-                <div class="mt-3 text-muted small">Processing...</div>
+
+        <h3 class="mt-4 fw-bold text-center">Detect cucumber diseases</h3>
+
+        <div class="upload-zone mt-4" id="uploadZone">
+            <div class="upload-icon mb-2">&uarr;</div>
+            <p class="mb-1 fw-bold">Upload a clear photo of your cucumber leaf</p>
+            <p class="text-muted" style="font-size: 11px;">JPG</p>
+            <button class="btn btn-primary-custom mt-2" onclick="document.getElementById('fileInput').click()">Choose photo</button>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+
+        <div class="mt-4">
+            <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Detects</p>
+            <div class="disease-badges">
+                <span class="badge-custom">Anthracnose</span>
+                <span class="badge-custom">Bacterial Wilt</span>
+                <span class="badge-custom">Downy Mildew</span>
+                <span class="badge-custom">Gummy Stem Blight</span>
             </div>
         </div>
-        <div id="screen-results" class="screen">
-            <div class="header-nav">
-                <div class="logo-container d-flex align-items-center">
-                    <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
-                    <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
-                </div>
-                <div class="text-muted small" id="resultDate">Today</div>
-            </div>
-            <div class="image-preview-container mt-3">
-                <img id="resultImage" src="" alt="Uploaded Plant">
-            </div>
-            <div id="alertBox" class="alert-box mt-3">
-            </div>
-            <div class="mt-4">
-                <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Confidence Scores</p>
-                <div class="d-flex justify-content-between small fw-bold mb-1">
-                    <span id="resDiseaseName">Disease</span>
-                    <span id="resConfidence">0%</span>
-                </div>
-                <div class="progress" style="height: 6px;">
-                    <div id="resProgressBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
-                </div>
-            </div>
-            <div class="recommendation-box mt-4">
-                <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Recommendation</p>
-                <p class="small mb-0" id="resRecommendation">Consult a specialist for proper treatment and isolate the plant to prevent spread.</p>
-            </div>
-            <div class="mt-4">
-                <button class="btn btn-primary-custom w-100" id="btnScanAgain">Scan again</button>
+    </div>
+
+    <div id="screen-analyzing" class="screen text-center">
+        <div class="header-nav">
+            <div class="logo-container d-flex align-items-center">
+                <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
+                <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
             </div>
         </div>
-        <div id="screen-history" class="screen">
-            <div class="header-nav">
-                <div class="logo-container d-flex align-items-center">
-                    <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
-                    <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
-                </div>
-                <button class="btn btn-primary-custom btn-sm py-1 px-3" id="btnNewScan">+ New</button>
-            </div>
-            <div class="stats-box mt-3 d-flex justify-content-between text-center">
-                <div>
-                    <h3 class="fw-bold mb-0" id="statTotal">0</h3>
-                    <small class="text-muted" style="font-size: 10px;">Total scans</small>
-                </div>
-                <div>
-                    <h3 class="fw-bold mb-0" id="statDiseases">0</h3>
-                    <small class="text-muted" style="font-size: 10px;">Diseases</small>
-                </div>
-                <div>
-                    <h3 class="fw-bold mb-0" id="statAvg">0%</h3>
-                    <small class="text-muted" style="font-size: 10px;">Avg. confidence</small>
-                </div>
-            </div>
-            <p class="text-muted mt-4 mb-2" style="font-size: 11px; text-transform: uppercase;">Recent Scans</p>
-            <div id="historyList" class="history-list">
-            </div>
+
+        <h4 class="mt-5 pt-4">Analyzing your image...</h4>
+        <p class="text-muted small">This usually takes a few seconds</p>
+
+
+        <div class="spinner-area my-5">
+            <div class="spinner-border text-success" style="width: 4rem; height: 4rem;" role="status"></div>
+            <div class="mt-3 text-muted small">Processing...</div>
         </div>
 
     </div>
 
-    <script src="script.js"></script>
+    <div id="screen-results" class="screen">
+        <div class="header-nav">
+            <div class="logo-container d-flex align-items-center">
+                <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
+                <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
+            </div>
+            <div class="text-muted small" id="resultDate">Today</div>
+        </div>
+
+        <div class="image-preview-container mt-3">
+            <img id="resultImage" src="" alt="Uploaded Plant">
+        </div>
+
+        <div id="alertBox" class="alert-box mt-3">
+        </div>
+
+        <div class="mt-4">
+            <p class="text-muted" style="font-size: 11px; text-transform: uppercase;">Confidence Scores</p>
+            <div class="d-flex justify-content-between small fw-bold mb-1">
+                <span id="resDiseaseName">Disease</span>
+                <span id="resConfidence">0%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div id="resProgressBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="recommendation-box mt-4">
+            <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Recommendation</p>
+            <p class="small mb-0" id="resRecommendation">Consult a specialist for proper treatment and isolate the plant to prevent spread.</p>
+        </div>
+
+        <div class="mt-4">
+            <button class="btn btn-primary-custom w-100" id="btnScanAgain">Scan again</button>
+        </div>
+    </div>
+
+    <div id="screen-history" class="screen">
+        <div class="header-nav">
+            <div class="logo-container d-flex align-items-center">
+                <img src="Logo_Leaf-Ai.png" alt="LEAF-AI Logo" style="height: 45px; width: auto; margin-right: 10px;">
+                <span class="text-muted" style="font-size: 0.9rem; border-left: 1px solid #ccc; padding-left: 10px;">Leaf-AI</span>
+            </div>
+            <button class="btn btn-primary-custom btn-sm py-1 px-3" id="btnNewScan">+ New</button>
+        </div>
+
+        <div class="stats-box mt-3 d-flex justify-content-between text-center">
+            <div>
+                <h3 class="fw-bold mb-0" id="statTotal">0</h3>
+                <small class="text-muted" style="font-size: 10px;">Total scans</small>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0" id="statDiseases">0</h3>
+                <small class="text-muted" style="font-size: 10px;">Diseases</small>
+            </div>
+            <div>
+                <h3 class="fw-bold mb-0" id="statAvg">0%</h3>
+                <small class="text-muted" style="font-size: 10px;">Avg. confidence</small>
+            </div>
+        </div>
+
+        <p class="text-muted mt-4 mb-2" style="font-size: 11px; text-transform: uppercase;">Recent Scans</p>
+
+        <div id="historyList" class="history-list">
+        </div>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 </html>
