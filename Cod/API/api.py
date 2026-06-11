@@ -1,3 +1,5 @@
+import base64
+
 from fastapi import FastAPI,UploadFile,File
 import keras as kr
 import numpy as np
@@ -67,6 +69,34 @@ model = kr.models.load_model('model_antrenare_licenta_v2.keras',custom_objects={
 clase_boli = ['Anthracnose', 'Bacterial Wilt', 'Downy Mildew', 'Gummy Stem Blight', 'Healthy']
 print("Done")
 
+ultimul_strat_conv = [l for l in model.layers if isinstance(l,kr.layers.Conv2D)][-1].name
+
+def genereaza_gradcam(imagine_array,image_pil,index_clasa):
+
+    grad_model = kr.models.Model(model.inputs,[model.get_layer(ultimul_strat_conv).output, model.output])
+
+    with tf.GradientTape() as tape:
+        activari_conv,predictii = grad_model(imagine_array)
+        scor_clasa = predictii[:,index_clasa]
+
+    gradienti = tape.gradient(scor_clasa,activari_conv)
+
+    ponderi = tf.reduce_mean(gradienti,axis=(0,1,2))
+
+    harta = tf.reduce_sum(activari_conv[0] * ponderi, axis=-1)
+    harta = tf.nn.relu(harta)
+    harta = harta / (tf.reduce_max(harta) + 1e-8)
+    harta = harta.numpy()
+
+    harta = cv2.resize(harta, (256, 256))
+    harta_color = cv2.applyColorMap(np.uint8(255 * harta), cv2.COLORMAP_JET)
+
+    original_bgr = cv2.cvtColor(np.array(image_pil), cv2.COLOR_RGB2BGR)
+    suprapunere = cv2.addWeighted(original_bgr, 0.6, harta_color, 0.4, 0)
+
+    _, buffer = cv2.imencode('.jpg', suprapunere)
+    return base64.b64encode(buffer).decode('utf-8')
+
 @app.post("/diagnostic")
 async def analizare_poza(file: UploadFile = File(...)):
     continut_poza = await file.read()
@@ -91,10 +121,20 @@ async def analizare_poza(file: UploadFile = File(...)):
         })
 
     rezultate = sorted(rezultate, key=lambda x: x['siguranta'], reverse=True)
+
+    gradcam_base64 = None
+
+    try:
+        gradcam_base64 = genereaza_gradcam(imagine_array, imagine, index_clasa_prezisa)
+    except Exception as e:
+        print(f"Grad-CAM error: {e}")
+
+
     return {
         "boala_detectata": rezultate[0]['boala'],
         "siguranta": rezultate[0]['siguranta'],
-        "alternative": rezultate[1:3]
+        "alternative": rezultate[1:3],
+        "gradcam": f"data:image/jpeg;base64,{gradcam_base64}" if gradcam_base64 else None
      }
 
 if __name__ == "__main__":
