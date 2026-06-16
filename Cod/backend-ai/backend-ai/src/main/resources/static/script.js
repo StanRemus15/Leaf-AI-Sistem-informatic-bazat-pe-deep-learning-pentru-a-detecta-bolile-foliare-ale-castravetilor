@@ -8,6 +8,17 @@ const screenHistory = document.getElementById('screen-history');
 
 let currentUser = null;
 
+function showScreen(screenElement) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    screenElement.classList.add('active');
+}
+document.getElementById('navToHistory').addEventListener('click', () => {
+    loadHistory();
+    showScreen(screenHistory);
+});
+document.getElementById('btnNewScan').addEventListener('click', () => showScreen(screenUpload));
+document.getElementById('btnScanAgain').addEventListener('click', () => showScreen(screenUpload));
+
 function saveUser(user) {
     currentUser = user;
     localStorage.setItem('leafai_user', JSON.stringify(user));
@@ -97,18 +108,7 @@ function enterApp() {
 document.getElementById('btnLogout').addEventListener('click', logout);
 
 
-function showScreen(screenElement) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    screenElement.classList.add('active');
-}
 
-document.getElementById('navToHistory').addEventListener('click', () => {
-    loadHistory();
-    showScreen(screenHistory);
-});
-
-document.getElementById('btnNewScan').addEventListener('click', () => showScreen(screenUpload));
-document.getElementById('btnScanAgain').addEventListener('click', () => showScreen(screenUpload));
 
 
 fileInput.addEventListener('change', async function() {
@@ -156,7 +156,6 @@ fileInput.addEventListener('change', async function() {
 function populateResults(data) {
     const alertBox = document.getElementById('alertBox');
     const recBox = document.querySelector('.recommendation-box');
-
     if (data.eroare) {
         alertBox.className = "alert-box danger";
         alertBox.innerHTML = `
@@ -164,25 +163,20 @@ function populateResults(data) {
                 <div class="fw-bold">Invalid Scan</div>
                 <div style="font-size: 11px;">${data.eroare}</div>
             </div>`;
-
         document.getElementById('resDiseaseName').innerText = "Undetected";
         document.getElementById('resConfidence').innerText = "0%";
         document.getElementById('resProgressBar').style.width = "0%";
         document.getElementById('resProgressBar').style.backgroundColor = "#ccc";
-
         recBox.innerHTML = `
             <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase;">Recommendation</p>
             <p class="small mb-0">Please upload a clear image containing exclusively plant leaves to run the diagnosis.</p>
         `;
         return;
     }
-
     const isHealthy = data.boala_detectata.toLowerCase().includes('healthy');
     const isUncertain = data.siguranta < 65;
-
     const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     document.getElementById('resultDate').innerText = today;
-
     if (isUncertain) {
         alertBox.className = "alert-box warning";
         alertBox.innerHTML = `
@@ -209,7 +203,16 @@ function populateResults(data) {
     document.getElementById('resDiseaseName').innerText = data.boala_detectata;
     document.getElementById('resConfidence').innerText = data.siguranta.toFixed(0) + '%';
     document.getElementById('resProgressBar').style.width = data.siguranta + '%';
-    document.getElementById('resProgressBar').style.backgroundColor = isUncertain ? "#EF9F27" : (isHealthy ? "#3B6D11" : "#E24B4A");
+
+    let culoareBara;
+    if(data.siguranta >= 75)
+        culoareBara="#3B6D11";
+    else if (data.siguranta >= 50)
+        culoareBara = "#EF9F27";
+    else
+        culoareBara = "#E24B4A";
+
+document.getElementById('resProgressBar').style.backgroundColor = culoareBara;
 
     let alternativeHTML = `<p class="text-muted mt-3" style="font-size: 10px; text-transform: uppercase;">Other possibilities:</p>`;
     data.alternative.forEach(alt => {
@@ -251,10 +254,10 @@ async function loadHistory() {
         if (!response.ok) return;
 
         const dateIstoric = await response.json();
-
         const totalScans = dateIstoric.length;
         const totalDiseases = dateIstoric.filter(d => d.boala && !d.boala.toLowerCase().includes('healthy')).length;
-        const avgConf = totalScans > 0 ? (dateIstoric.reduce((sum, d) => sum + (d.siguranta || 0), 0) / totalScans).toFixed(0) : 0;
+        const avgConf = totalScans > 0 ? (dateIstoric.reduce((sum, d) => sum + (d.siguranta || 0), 0) / totalScans)
+            .toFixed(0) : 0;
 
         document.getElementById('statTotal').innerText = totalScans;
         document.getElementById('statDiseases').innerText = totalDiseases;
@@ -277,17 +280,20 @@ async function loadHistory() {
         dateIstoric.reverse().forEach(item => {
             const boalaNume = item.boala || "Unknown Diagnosis";
             const siguranta = item.siguranta || 0;
-            const isHealthy = boalaNume.toLowerCase().includes('healthy');
 
-            let typeClass = 'danger';
-            let dotColor = 'var(--danger)';
 
-            if (isHealthy) {
+            let typeClass;
+            let dotColor;
+
+            if (siguranta >= 75) {
                 typeClass = 'success';
                 dotColor = 'var(--primary)';
-            } else if (siguranta < 75) {
+            } else if (siguranta >= 50) {
                 typeClass = 'warning';
                 dotColor = 'var(--warning)';
+            } else {
+                typeClass = 'danger';
+                dotColor = 'var(--danger)';
             }
 
             let scanDate = "Unknown date";

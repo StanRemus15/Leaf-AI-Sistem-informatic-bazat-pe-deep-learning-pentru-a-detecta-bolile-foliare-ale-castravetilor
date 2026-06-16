@@ -11,7 +11,6 @@ public class Diagnostic {
     private String boala;
     private Double siguranta;
     private LocalDateTime dataScanarii;
-
     private Long userId;
 
     public Diagnostic() {
@@ -23,8 +22,6 @@ public class Diagnostic {
     public Double getSiguranta() {return siguranta;}
     public void setSiguranta(Double siguranta) {this.siguranta = siguranta;}
     public LocalDateTime getDataScanarii() {return dataScanarii;}
-
-
     public Long getUserId(){return userId;}
     public void setUserId(Long userId){this.userId = userId;}
 }

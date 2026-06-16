@@ -34,50 +34,31 @@ public class DiagnosticController {
     public ResponseEntity<String> PozaLaAi(@RequestParam("file") MultipartFile file,
                                            @RequestParam("userId") Long userId) {
         try {
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-
             ByteArrayResource pozaPy = new ByteArrayResource(file.getBytes()) {
                 @Override
                 public String getFilename() {
                     return file.getOriginalFilename() != null ? file.getOriginalFilename() : "poza.jpg";
                 }
             };
-
-
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("file", pozaPy);
-
-
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-
             ResponseEntity<String> response = restTemplate.postForEntity(PYTHON_PATH, requestEntity, String.class);
-
             String jsonPy = response.getBody();
             System.out.println("JSON primit de la Python: " + jsonPy);
-
-
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(jsonPy);
-
             if(root.has("eroare")) {
-
                 return ResponseEntity.ok(jsonPy);
             }
-
             Diagnostic diagnostic = new Diagnostic();
             diagnostic.setBoala(root.get("boala_detectata").asText());
             diagnostic.setSiguranta(root.get("siguranta").asDouble());
             diagnostic.setUserId(userId);
-
             diagnosticRepository.save(diagnostic);
-
-
             return ResponseEntity.ok(jsonPy);
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Eroare de comunicare: " + e.getMessage());

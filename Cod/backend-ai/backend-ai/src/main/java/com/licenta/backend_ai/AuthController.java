@@ -27,7 +27,7 @@ public class AuthController {
             }
             return sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("Eroare la criptarea parolei", e);
+            throw new RuntimeException("Encryption error", e);
         }
     }
 
@@ -50,7 +50,6 @@ public class AuthController {
         user.setUsername(username.trim());
         user.setPasswordHash(hashPassword(password));
         userRepository.save(user);
-
         return ResponseEntity.ok(Map.of("id", user.getId(), "username", user.getUsername()));
     }
 
