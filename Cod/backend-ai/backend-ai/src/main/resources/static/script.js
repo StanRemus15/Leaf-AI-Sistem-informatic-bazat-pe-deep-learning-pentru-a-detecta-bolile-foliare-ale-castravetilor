@@ -121,9 +121,12 @@ fileInput.addEventListener('change', async function() {
         return;
     }
 
-    const reader = new FileReader();
-    reader.onload = function(e) { resultImage.src = e.target.result; }
-    reader.readAsDataURL(file);
+    if (resultImage.dataset.objectUrl) {
+        URL.revokeObjectURL(resultImage.dataset.objectUrl);
+    }
+    const objectUrl = URL.createObjectURL(file);
+    resultImage.src = objectUrl;
+    resultImage.dataset.objectUrl = objectUrl;
 
     showScreen(screenAnalyzing);
 
