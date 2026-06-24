@@ -93,10 +93,10 @@ netstat -ano | findstr :8080
 Ultima coloană din rezultat este PID-ul procesului. Acesta se oprește cu:
  
 ```
-taskkill /PID <pid> /F
+taskkill /F /PID PID
 ```
  
-unde `<pid>` este numărul găsit la pasul anterior.
+unde `PID` este numărul găsit la pasul anterior.
  
 Pe Linux sau macOS:
  
