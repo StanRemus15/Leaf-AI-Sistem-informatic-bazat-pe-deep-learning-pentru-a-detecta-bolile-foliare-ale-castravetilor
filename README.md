@@ -1,4 +1,4 @@
-# Leaf-AI - Descrierea
+# Leaf-AI
 Sistem informatic bazat pe Deep Learning pentru detectarea bolilor foliare la castravete.
 
 ## 1. Adresa repository-ului
