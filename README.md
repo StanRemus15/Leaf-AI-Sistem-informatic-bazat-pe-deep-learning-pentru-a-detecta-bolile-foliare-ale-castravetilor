@@ -12,12 +12,12 @@ Nu conține fișiere binare compilate: folderul `target` al proiectului Java, fi
 Fișierele cu extensia `.keras` sunt ponderile modelului antrenat, iar `leafai.p12` este certificatul pentru HTTPS. 
 Acestea nu sunt binare compilate ale aplicației, ci resurse necesare la rulare.
 
-## 2. Cerințe preliminare
+## 2. Cerințe
  
 Pentru rularea aplicației sunt necesare:
  
 - Java Development Kit 21
-- Maven 3.9 sau mai nou (opțional, fiindcă proiectul include Maven Wrapper)
+- Maven 3.9 sau mai nou (opțional)
 - Python 3.10 sau mai nou
 
 Aplicația folosește două procese care rulează în paralel: serviciul Python pe portul 8050 și backend-ul Java pe portul 8443. Backend-ul servește și interfața web.
