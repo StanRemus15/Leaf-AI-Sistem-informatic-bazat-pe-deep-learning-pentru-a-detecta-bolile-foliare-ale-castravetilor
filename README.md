@@ -82,8 +82,10 @@ Fiind certificat autosemnat, browserul afișează un avertisment la prima accesa
 
 Pentru telefon trebuie să se pornească serverul de pe calculator sau laptop și să se ruleze comanda:
 
+```
 ipconfig (Windows)
 hostname -I (Linux sau MacOS)
+```
 
 Apoi se deschide în browser de pe telefon cu adresa:
  ```
