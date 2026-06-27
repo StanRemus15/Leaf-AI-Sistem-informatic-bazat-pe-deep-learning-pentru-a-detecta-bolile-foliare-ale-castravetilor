@@ -54,7 +54,7 @@ Serviciul Python trebuie pornit primul, fiindcă backend-ul îi trimite imaginil
  
 ```
 cd Cod/API
-python api.py
+uvicorn api:app --host 0.0.0.0 --port 8050
 ```
  
 Serviciul pornește pe `http://127.0.0.1:8050`. Comanda se rulează din folderul `Cod/API`, ca fișierul cu modelul (`model_antrenare_licenta_v2.keras`) să fie găsit lângă `api.py`.
@@ -79,6 +79,17 @@ https://localhost:8443/interfata.html
 ```
  
 Fiind certificat autosemnat, browserul afișează un avertisment la prima accesare, care se acceptă pentru a continua. Aplicația poate fi folosită atât de pe desktop, cât și de pe telefon.
+
+Pentru telefon trebuie să se pornească serverul de pe calculator sau laptop și să se ruleze comanda:
+
+ipconfig (Windows)
+hostname -I (Linux sau MacOS)
+
+Apoi se deschide în browser de pe telefon cu adresa:
+ ```
+https://IP:8443/interfata.html
+```
+unde IP este rezultatul comenzii de mai sus
  
 ### 4.4. Dacă portul 8080 este ocupat
  
@@ -106,7 +117,4 @@ kill -9 <pid>
 ```
  
 După ce portul este liber, se pornește din nou backend-ul.
- 
-## 5. Setul de date
- 
-Setul de date este inclus în repository, în folderul `DataSetOrganized/data`, organizat pe cele cinci clase (Anthracnose, Bacterial Wilt, Downy Mildew, Gummy Stem Blight, Healthy) și împărțit în subseturile de antrenare, validare și testare. Pentru reantrenarea modelului din notebook-uri, căile către set trebuie ajustate la locația locală.
+
