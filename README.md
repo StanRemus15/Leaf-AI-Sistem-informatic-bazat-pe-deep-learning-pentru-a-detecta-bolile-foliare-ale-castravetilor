@@ -120,3 +120,6 @@ kill -9 <pid>
  
 După ce portul este liber, se pornește din nou backend-ul.
 
+## 5. Setul de date
+
+Am folosit un subset din setul "Cucumber Disease Recognition Dataset" de pe Kaggle: https://www.kaggle.com/datasets/sujaykapadnis/cucumber-disease-recognition-dataset/data
